@@ -4,7 +4,7 @@ const table = document.querySelector('table');
 const tbody = document.querySelector('tbody');
 
 form.onchange = ({ target }) => {
-    if (target.matches('input')) {
+    if (target.matches('input') || target.matches('select')) {
         validateInput(target);
     }
 };
@@ -13,7 +13,7 @@ form.onsubmit = (event) => {
     const elements = [...form.elements];
 
     const isValid = elements.reduce((acc, elem) => {
-        if (elem.matches('input')) {
+        if (elem.matches('input') || elem.matches('select')) {
             const isValidField = validateInput(elem);
             if (!isValidField) elem.focus();
 
@@ -21,6 +21,7 @@ form.onsubmit = (event) => {
         }
         return acc;
     }, true);
+
     const nameValue = form.elements.name.value;
     const lastNameValue = form.elements.lastName.value;
     const dateValue = form.elements.dateOfBirth.value;
@@ -39,10 +40,13 @@ form.onsubmit = (event) => {
         });
         return value.join(', ');
     }
-    renderRow(nameValue, lastNameValue, dateValue, genderValue, cityValue, addressValue, languageValue);
-    form.classList.add('hide');
-    table.classList.remove('hide');
-};
+    if (isValid) {
+        renderRow(nameValue, lastNameValue, dateValue, genderValue, cityValue, addressValue, languageValue);
+        form.classList.add('hide');
+        table.classList.remove('hide');
+    }
+    }
+
 input.focus();
 
 /**
@@ -50,7 +54,7 @@ input.focus();
  * @return {boolean}
  */
 function validateInput (input) {
-    const { value, type, required, minLength, maxLength, nextElementSibling: validationMessage } = input;
+    const { value, name, type, required, minLength, maxLength, nextElementSibling: validationMessage } = input;
 
     function showError (text) {
         input.classList.add('is-invalid');
@@ -82,6 +86,11 @@ function validateInput (input) {
         showError(`This field should has maximum ${maxLength} symbols`);
         return false;
     }
+    if (name === 'city' && value === '--') {
+         showError('Select city');
+         return false;
+    }
+
     showSuccess();
     return true;
 }
