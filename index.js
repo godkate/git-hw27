@@ -38,9 +38,16 @@ form.onsubmit = (event) => {
                 value.push(elem.value);
             }
         });
+        if (value.length === 0) {
+            const err = document.querySelector('.err');
+            err.classList.add('invalid-feedback');
+            err.style.display = "block";
+            err.innerText = 'Choose a language';
+            return;
+        }
         return value.join(', ');
     }
-    if (isValid) {
+    if (isValid && languagesValue()) {
         renderRow(nameValue, lastNameValue, dateValue, genderValue, cityValue, addressValue, languageValue);
         form.classList.add('hide');
         table.classList.remove('hide');
